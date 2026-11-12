@@ -1,10 +1,27 @@
 {
-  "name": "ТЭМ18ДМ — Электрический тренажёр",
+  "id": "./index.html",
+  "name": "ТЭМ18ДМ — Электрический тренажёр (ЭСУВТ)",
   "short_name": "ТЭМ18ДМ",
   "lang": "ru",
-  "start_url": "./",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0b1118",
   "theme_color": "#101923",
-  "description": "Учебный тренажёр электрической схемы ТЭМ18ДМ 13-й серии с ЭСУВТ"
+  "description": "Интерактивный тренажёр электрической схемы ТЭМ18ДМ 13-й серии с ЭСУВТ и УСТА",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }
