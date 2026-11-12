@@ -112,3 +112,114 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:17px 0;color:#6f
   .module-grid{grid-template-columns:1fr}
   .search-input{min-width:100%}
 }
+/* Интерактивное окно графической схемы с зумом и подсветкой */
+.schema-viewer-wrap {
+  margin-top: 16px;
+  background: #070c12;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  overflow: hidden;
+}
+.schema-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.schema-toolbar-title {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.schema-toolbar-title strong {
+  color: var(--green);
+}
+.schema-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.schema-btn {
+  background: #101c28;
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 6px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: 0.15s;
+}
+.schema-btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.schema-btn.focus-btn {
+  background: #153d32;
+  border-color: var(--green);
+  color: #82f0c5;
+}
+.schema-viewport {
+  position: relative;
+  width: 100%;
+  height: 460px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: radial-gradient(circle, #101923 0%, #070b10 100%);
+}
+.schema-viewport.dragging {
+  cursor: grabbing;
+}
+.schema-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.schema-canvas img {
+  display: block;
+  max-width: none;
+  width: 2400px; /* Базовая ширина координатной сетки */
+  height: auto;
+  pointer-events: none;
+}
+.schema-highlight {
+  position: absolute;
+  border: 3px solid var(--green);
+  background: rgba(67, 214, 160, 0.14);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(7, 11, 16, 0.58), 0 0 25px rgba(67, 214, 160, 0.65);
+  pointer-events: none;
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: pulseZone 2s infinite alternate;
+}
+.schema-highlight-label {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  background: var(--green);
+  color: #052218;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+@keyframes pulseZone {
+  0% { border-color: #43d6a0; box-shadow: 0 0 0 9999px rgba(7, 11, 16, 0.58), 0 0 15px rgba(67, 214, 160, 0.4); }
+  100% { border-color: #ffd18a; box-shadow: 0 0 0 9999px rgba(7, 11, 16, 0.58), 0 0 30px rgba(241, 182, 91, 0.85); }
+}
+@media(max-width: 600px) {
+  .schema-viewport { height: 340px; }
+}
