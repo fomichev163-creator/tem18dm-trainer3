@@ -682,16 +682,133 @@ const schemaZones = {
 };
 
 // Рендер интерактивных модулей со встроенным окном схемы и зумом
+// Генератор интерактивной анимационной SVG-схемы для каждого шага
+function buildAnimatedCircuitSVG(chain) {
+  const stepWidth = 155;
+  const startX = 65;
+  const centerY = 98;
+  const totalWidth = Math.max(startX * 2 + (chain.length - 1) * stepWidth, 780);
+
+  let wiresBase = "";
+  let wiresFlow = "";
+  let nodesSvg = "";
+
+  // Шинные линии (+75В слева и -75В справа)
+  const lastX = startX + (chain.length - 1) * stepWidth;
+
+  chain.forEach((item, idx) => {
+    const x = startX + idx * stepWidth;
+    if (idx < chain.length - 1) {
+      const nextX = startX + (idx + 1) * stepWidth;
+      wiresBase += `<line x1="${x + 28}" y1="${centerY}" x2="${nextX - 28}" y2="${centerY}" class="wire-base" />`;
+      wiresFlow += `<line x1="${x + 28}" y1="${centerY}" x2="${nextX - 28}" y2="${centerY}" class="wire-current" data-wire-idx="${idx}" />`;
+      // Стрелка направления тока посередине участка
+      const midX = (x + nextX) / 2;
+      wiresFlow += `<polygon points="${midX-5},${centerY-5} ${midX+6},${centerY} ${midX-5},${centerY+5}" fill="#43d6a0" class="wire-arrow" data-wire-idx="${idx}" />`;
+    }
+
+    // Короткие подписи (разбиваем длинный текст на 2 строки)
+    const rawText = item.v.replace(/→/g, "·");
+    const line1 = rawText.length > 22 ? rawText.slice(0, 22) + "…" : rawText;
+    const line2 = rawText.length > 22 ? rawText.slice(22, 44) + (rawText.length > 44 ? "…" : "") : "";
+
+    let symbol = "";
+    let typeLabel = "";
+
+    if (item.t === "source") {
+      typeLabel = "ИСТОЧНИК (+75В)";
+      symbol = `
+        <circle cx="${x}" cy="${centerY}" r="22" fill="#12352a" stroke="#43d6a0" stroke-width="2.5"/>
+        <text x="${x}" y="${centerY + 5}" fill="#43d6a0" font-size="16" font-weight="900" text-anchor="middle">+</text>
+      `;
+    } else if (item.t === "ground") {
+      typeLabel = "МИНУС ЦЕПИ";
+      symbol = `
+        <circle cx="${x}" cy="${centerY}" r="20" fill="#28151d" stroke="#ff6b6b" stroke-width="2"/>
+        <line x1="${x - 9}" y1="${centerY - 2}" x2="${x + 9}" y2="${centerY - 2}" stroke="#ff8b94" stroke-width="2.5"/>
+        <line x1="${x - 6}" y1="${centerY + 4}" x2="${x + 6}" y2="${centerY + 4}" stroke="#ff8b94" stroke-width="2"/>
+        <line x1="${x - 3}" y1="${centerY + 9}" x2="${x + 3}" y2="${centerY + 9}" stroke="#ff8b94" stroke-width="2"/>
+      `;
+    } else if (item.t === "coil") {
+      typeLabel = "КАТУШКА / АППАРАТ";
+      symbol = `
+        <rect x="${x - 26}" y="${centerY - 18}" width="52" height="36" rx="5" class="svg-coil-rect"/>
+        <line x1="${x - 12}" y1="${centerY - 18}" x2="${x + 12}" y2="${centerY + 18}" stroke="#68b8ff" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="${x}" cy="${centerY - 25}" r="4" fill="#43d6a0">
+          <animate attributeName="opacity" values="1;0.25;1" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      `;
+    } else if (item.t === "contact-no") {
+      typeLabel = "ЗАМЫКАЮЩИЙ (З.К.)";
+      symbol = `
+        <rect x="${x - 28}" y="${centerY - 18}" width="56" height="34" rx="6" fill="#0f2920" stroke="#2b6e56" stroke-width="1.5"/>
+        <circle cx="${x - 16}" cy="${centerY}" r="4" fill="#43d6a0"/>
+        <circle cx="${x + 16}" cy="${centerY}" r="4" fill="#43d6a0"/>
+        <line x1="${x - 16}" y1="${centerY}" x2="${x + 16}" y2="${centerY - 2}" stroke="#43d6a0" class="svg-contact-blade"/>
+      `;
+    } else if (item.t === "contact-nc") {
+      typeLabel = "РАЗМЫКАЮЩИЙ (Р.К.)";
+      symbol = `
+        <rect x="${x - 28}" y="${centerY - 18}" width="56" height="34" rx="6" fill="#2a2115" stroke="#8a6529" stroke-width="1.5"/>
+        <circle cx="${x - 16}" cy="${centerY}" r="4" fill="#f1b65b"/>
+        <circle cx="${x + 16}" cy="${centerY}" r="4" fill="#f1b65b"/>
+        <line x1="${x + 16}" y1="${centerY}" x2="${x + 16}" y2="${centerY - 9}" stroke="#f1b65b" stroke-width="2"/>
+        <line x1="${x - 16}" y1="${centerY}" x2="${x + 17}" y2="${centerY - 7}" stroke="#f1b65b" class="svg-contact-blade"/>
+      `;
+    } else {
+      typeLabel = "ПРОВОД / ЗАЖИМ";
+      symbol = `
+        <rect x="${x - 26}" y="${centerY - 14}" width="52" height="28" rx="14" fill="#101e2c" stroke="#3b6285" stroke-width="1.8"/>
+        <circle cx="${x - 12}" cy="${centerY}" r="3" fill="#8ec8ff"/>
+        <circle cx="${x + 12}" cy="${centerY}" r="3" fill="#8ec8ff"/>
+        <line x1="${x - 12}" y1="${centerY}" x2="${x + 12}" y2="${centerY}" stroke="#8ec8ff" stroke-width="2"/>
+      `;
+    }
+
+    nodesSvg += `
+      <g class="svg-node-box" data-node-idx="${idx}">
+        <text x="${x}" y="${centerY - 32}" class="svg-label-sub">${typeLabel}</text>
+        ${symbol}
+        <text x="${x}" y="${centerY + 36}" class="svg-label-main"><title>${item.v}</title>${line1}</text>
+        ${line2 ? `<text x="${x}" y="${centerY + 50}" class="svg-label-sub"><title>${item.v}</title>${line2}</text>` : ""}
+      </g>
+    `;
+  });
+
+  return `
+    <svg class="circuit-svg" viewBox="0 0 ${totalWidth} 195" width="${totalWidth}" height="195">
+      ${wiresBase}
+      ${wiresFlow}
+      ${nodesSvg}
+    </svg>
+  `;
+}
+
+// Рендер интерактивных модулей с анимационной SVG-схемой и окном полной схемы
 function renderModulePage(key){
   const data = modulesData[key];
   const container = document.getElementById(`page-${key}`);
   if(!data || !container) return;
 
   let currentStep = 0;
+  let animTimer = null;
 
   function updateView(){
+    if(animTimer) { clearInterval(animTimer); animTimer = null; }
     const step = data.steps[currentStep];
     const zone = (schemaZones[key] && schemaZones[key][currentStep]) || {x:5, y:5, w:30, h:25, label:step.name};
+
+    // Разделяем статусы аппаратов на ВКЛЮЧЕННЫЕ и ОТКЛЮЧЕННЫЕ/БЛОКИРОВАННЫЕ
+    const onApps = [];
+    const offApps = [];
+    step.activeApps.forEach(a => {
+      const low = a.toLowerCase();
+      if(low.includes("откл") || low.includes("разомк") || low.includes("запрещ") || low.includes("блокир")) {
+        offApps.push(a);
+      } else {
+        onApps.push(a);
+      }
+    });
 
     container.innerHTML = `
       <div class="eyebrow">${data.eyebrow}</div>
@@ -718,9 +835,47 @@ function renderModulePage(key){
           <span class="tag blue">${step.tag}</span>
         </div>
 
+        <!-- НОВЫЙ БЛОК: Анимационная схема прохождения тока -->
+        <div class="anim-schema-wrap">
+          <div class="anim-toolbar">
+            <div class="anim-toolbar-title">
+              <span>⚡ Анимация прохождения тока по цепи</span>
+            </div>
+            <div class="anim-legend">
+              <span><i class="dot-flow"></i> Ток в проводе</span>
+              <span><i class="dot-nc"></i> Р.К. (замкнут)</span>
+              <span><i class="dot-coil"></i> Катушка под питанием</span>
+            </div>
+            <div class="schema-controls">
+              <button class="schema-btn focus-btn" id="play-step-${key}">▶ Проиграть подачу тока по шагам</button>
+              <button class="schema-btn" id="toggle-flow-${key}">⏸ Пауза / Пуск тока</button>
+            </div>
+          </div>
+
+          <div class="svg-scroll-box" id="svg-box-${key}">
+            ${buildAnimatedCircuitSVG(step.chain)}
+          </div>
+
+          <div class="switching-summary">
+            <div class="sw-col on-col">
+              <div class="sw-col-title">⚡ Включилось / Под питанием:</div>
+              <div class="sw-items">
+                ${onApps.length ? onApps.map(a => `<span class="badge-app">✔ ${a}</span>`).join("") : `<span class="muted">Нет включённых аппаратов</span>`}
+              </div>
+            </div>
+            <div class="sw-col off-col">
+              <div class="sw-col-title">○ Отключилось / Заблокировано:</div>
+              <div class="sw-items">
+                ${offApps.length ? offApps.map(a => `<span class="badge-app off">✖ ${a}</span>`).join("") : `<span class="muted">Все задействованные цепи замкнуты</span>`}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Текстовая цепочка проводов -->
         <div class="circuit-box">
           <div class="circuit-caption">
-            <span>Мнемосхема активной цепи (по документации ТЭМ18ДМ ЭСУВТ)</span>
+            <span>Полная детализация проводов и зажимов</span>
             <span>Шаг ${currentStep+1} из ${data.steps.length}</span>
           </div>
           <div class="chain-flow">
@@ -728,9 +883,6 @@ function renderModulePage(key){
               <span class="node ${node.t}">${node.v}</span>
               ${i < step.chain.length - 1 ? '<span class="arrow">→</span>' : ''}
             `).join("")}
-          </div>
-          <div class="state-badges">
-            ${step.activeApps.map(a => `<span class="badge-app">✔ ${a}</span>`).join("")}
           </div>
         </div>
 
@@ -765,6 +917,39 @@ function renderModulePage(key){
       </div>
     `;
 
+    // Управление анимацией прохождения тока по узлам
+    const svgBox = container.querySelector(`#svg-box-${key}`);
+    const playBtn = container.querySelector(`#play-step-${key}`);
+    const toggleBtn = container.querySelector(`#toggle-flow-${key}`);
+
+    playBtn?.addEventListener("click", () => {
+      if(animTimer) clearInterval(animTimer);
+      const nodes = svgBox.querySelectorAll(".svg-node-box");
+      const wires = svgBox.querySelectorAll(".wire-current, .wire-arrow");
+      nodes.forEach(n => n.classList.add("dimmed"));
+      wires.forEach(w => w.classList.add("paused"));
+
+      let idx = 0;
+      nodes[0]?.classList.remove("dimmed");
+      animTimer = setInterval(() => {
+        svgBox.querySelectorAll(`[data-wire-idx="${idx}"]`).forEach(w => w.classList.remove("paused"));
+        idx++;
+        if(idx < nodes.length) {
+          nodes[idx].classList.remove("dimmed");
+          // Автопрокрутка SVG вслед за бегущим током
+          const targetX = Math.max(0, idx * 155 - svgBox.clientWidth / 2);
+          svgBox.scrollTo({left: targetX, behavior: "smooth"});
+        } else {
+          clearInterval(animTimer);
+          animTimer = null;
+        }
+      }, 550);
+    });
+
+    toggleBtn?.addEventListener("click", () => {
+      svgBox.querySelectorAll(".wire-current").forEach(w => w.classList.toggle("paused"));
+    });
+
     // Навигация по шагам
     container.querySelectorAll(".step-pill").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -777,7 +962,7 @@ function renderModulePage(key){
     if(prevBtn) prevBtn.addEventListener("click", () => { if(currentStep>0){ currentStep--; updateView(); }});
     if(nextBtn) nextBtn.addEventListener("click", () => { if(currentStep<data.steps.length-1){ currentStep++; updateView(); }});
 
-    // Логика зума и панорамирования схемы
+    // Логика зума и панорамирования полной схемы
     const viewport = container.querySelector(`#viewport-${key}`);
     const canvas = container.querySelector(`#canvas-${key}`);
     const img = container.querySelector(`#img-${key}`);
@@ -822,7 +1007,6 @@ function renderModulePage(key){
       img.addEventListener("load", () => focusOnZone(false));
     }
 
-    // Кнопки управления схемой
     container.querySelector(`#focus-zone-${key}`)?.addEventListener("click", () => focusOnZone(true));
     container.querySelector(`#zoom-reset-${key}`)?.addEventListener("click", fitFullSchema);
     container.querySelector(`#zoom-in-${key}`)?.addEventListener("click", () => {
@@ -842,7 +1026,6 @@ function renderModulePage(key){
       applyTransform(true);
     });
 
-    // Перетаскивание мышью и пальцем (Pointer Events)
     viewport.addEventListener("pointerdown", e => {
       isDragging = true;
       startX = e.clientX - panX;
@@ -863,7 +1046,6 @@ function renderModulePage(key){
     viewport.addEventListener("pointerup", stopDrag);
     viewport.addEventListener("pointercancel", stopDrag);
 
-    // Зум колесом мыши
     viewport.addEventListener("wheel", e => {
       e.preventDefault();
       const rect = viewport.getBoundingClientRect();
@@ -880,6 +1062,8 @@ function renderModulePage(key){
 
   updateView();
 }
+
+Object.keys(modulesData).forEach(renderModulePage);
 
 Object.keys(modulesData).forEach(renderModulePage);
 
