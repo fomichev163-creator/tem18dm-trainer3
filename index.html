@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101923">
   <meta name="description" content="Интерактивный электрический тренажёр тепловоза ТЭМ18ДМ с ЭСУВТ и УСТА">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
   <title>ТЭМ18ДМ — Электрический тренажёр (ЭСУВТ)</title>
@@ -16,8 +18,40 @@
       <strong>ТЭМ18ДМ · ЭСУВТ</strong>
       <small>Интерактивный тренажёр электрических цепей и диагностики</small>
     </div>
-    <span class="offline" id="connection">● Проверка связи</span>
+
+    <div class="topbar-actions">
+      <button class="schema-btn focus-btn" id="open-wire-modal">🔎 Поиск провода / зажима</button>
+      <button class="schema-btn" id="install-pwa-btn" style="display:none">📲 Установить приложение</button>
+      <span class="offline" id="connection">● Проверка связи</span>
+    </div>
   </header>
+
+  <!-- Модальное окно сквозного навигатора по проводам и зажимам -->
+  <div id="wire-modal" class="wire-modal" style="display:none">
+    <div class="wire-modal-card">
+      <div class="panel-head">
+        <div>
+          <strong>🔎 Сквозной навигатор по проводам, зажимам и аппаратам</strong>
+          <small class="muted" style="display:block">Введите номер провода (например: 2772, 5013, 3049, 187, 745), зажим (14/4, 2/6, 10/9) или разъём (Х7, Р15)</small>
+        </div>
+        <button class="secondary" id="close-wire-modal">✕ Закрыть</button>
+      </div>
+      <div class="wire-search-bar">
+        <input type="search" id="global-wire-input" placeholder="Например: 5013, 14/4, 3049, Х7, РВ6, SP1..." class="search-input" style="width:100%">
+        <div class="quick-wires">
+          <span>Быстрый выбор:</span>
+          <button class="wire-chip" data-q="14/4">Зажим 14/4</button>
+          <button class="wire-chip" data-q="2772">Пр. 2772 (КБУ)</button>
+          <button class="wire-chip" data-q="3049">Пр. 3049 (ЭСУВТ)</button>
+          <button class="wire-chip" data-q="5013">Пр. 5013 (Ш1)</button>
+          <button class="wire-chip" data-q="187">Пр. 187 (КВ)</button>
+          <button class="wire-chip" data-q="745">Пр. 745 (РТ6)</button>
+          <button class="wire-chip" data-q="5138">Пр. 5138 (ВЗТ)</button>
+        </div>
+      </div>
+      <div id="global-wire-results" class="wire-results-list"></div>
+    </div>
+  </div>
 
   <main class="layout">
     <aside class="sidebar">
@@ -44,6 +78,7 @@
             <p>Пошаговая визуализация прохождения тока по проводам, зажимам и разъёмам, работа аппаратов и поиск неисправностей.</p>
             <div class="hero-actions">
               <button class="primary" data-goto="start">Начать с пуска дизеля <span>→</span></button>
+              <button class="secondary" id="hero-wire-btn">🔎 Найти провод по номеру</button>
               <button class="secondary" data-goto="faults">Тренажёр отказов</button>
             </div>
           </div>
