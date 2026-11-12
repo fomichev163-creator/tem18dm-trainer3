@@ -1,0 +1,10 @@
+{
+  "name": "ТЭМ18ДМ — Электрический тренажёр",
+  "short_name": "ТЭМ18ДМ",
+  "lang": "ru",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b1118",
+  "theme_color": "#101923",
+  "description": "Учебный тренажёр электрической схемы ТЭМ18ДМ 13-й серии с ЭСУВТ"
+}

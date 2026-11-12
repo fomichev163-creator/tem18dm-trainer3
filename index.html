@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101923">
+  <meta name="description" content="Учебный электрический тренажёр тепловоза ТЭМ18ДМ 13-й серии с ЭСУВТ">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>ТЭМ18ДМ — Электрический тренажёр</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">ТЭМ</div>
+    <div><strong>ТЭМ18ДМ</strong><small>Электрический тренажёр · 13-я серия · ЭСУВТ</small></div>
+    <span class="offline" id="connection">● Проверка связи</span>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <p class="nav-caption">РАЗДЕЛЫ ТРЕНАЖЁРА</p>
+      <button class="nav-item active" data-page="home">⌂ Главная</button>
+      <button class="nav-item" data-page="start">⏻ Пуск дизеля</button>
+      <button class="nav-item" data-page="motion">➜ Приведение в движение</button>
+      <button class="nav-item" data-page="excitation">ϟ Возбуждение</button>
+      <button class="nav-item" data-page="field">⇄ Ослабление поля</button>
+      <button class="nav-item" data-page="protection">⬡ Защита</button>
+      <button class="nav-item" data-page="sart">❄ САРТ</button>
+      <button class="nav-item" data-page="brake">▤ Реостатный тормоз</button>
+      <button class="nav-item" data-page="faults">⚠ Режим неисправностей</button>
+      <div class="sidebar-note">Учебная модель. Не предназначена для управления реальным локомотивом.</div>
+    </aside>
+
+    <section class="content">
+      <div id="page-home" class="page active">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">ИНТЕРАКТИВНОЕ ОБУЧЕНИЕ</div>
+            <h1>Электрическая схема<br>ТЭМ18ДМ</h1>
+            <p>Изучай последовательность работы аппаратов, прохождение тока и причины отказов.</p>
+            <button class="primary" data-goto="start">Перейти к разделам <span>→</span></button>
+          </div>
+          <div class="hero-stamp"><span>13</span><small>СЕРИЯ<br>ЭСУВТ</small></div>
+        </div>
+        <h2>Учебные модули</h2>
+        <div class="module-grid">
+          <button class="module-card" data-goto="start"><b>01</b><span>⏻</span><strong>Пуск дизеля</strong><small>Последовательность запуска и блокировки</small></button>
+          <button class="module-card" data-goto="motion"><b>02</b><span>➜</span><strong>Приведение в движение</strong><small>Сбор схемы тяги</small></button>
+          <button class="module-card" data-goto="field"><b>03</b><span>⇄</span><strong>Ослабление поля</strong><small>Ш1, Ш2, РУ40, РВ6</small></button>
+          <button class="module-card" data-goto="protection"><b>04</b><span>⬡</span><strong>Защита</strong><small>Срабатывания и блокировки</small></button>
+          <button class="module-card" data-goto="sart"><b>05</b><span>❄</span><strong>САРТ</strong><small>Термореле, вентилятор, жалюзи</small></button>
+          <button class="module-card" data-goto="faults"><b>06</b><span>⚠</span><strong>Неисправности</strong><small>Поиск обрыва и отказавшего аппарата</small></button>
+        </div>
+        <div class="notice"><strong>Принцип разработки:</strong> каждая цепь будет переноситься из документации с обозначениями аппаратов, контактами, проводами и зажимами. Непроверенные соединения не будут выдаваться за достоверные.</div>
+      </div>
+
+      <div id="page-start" class="page">
+        <div class="eyebrow">МОДУЛЬ 01</div><h1>Пуск дизеля</h1>
+        <p class="lead">Здесь будет пошаговая сборка цепей запуска с анимацией прохождения тока и изменением контактов.</p>
+        <div class="panel">
+          <div class="panel-head"><strong>Сценарий обучения</strong><span class="tag amber">В разработке</span></div>
+          <ol class="steps">
+            <li>Проверка исходных условий и питания цепей управления.</li>
+            <li>Команда «Пуск дизеля».</li>
+            <li>Последовательное срабатывание реле и контакторов.</li>
+            <li>Прокрутка коленчатого вала и контроль условий запуска.</li>
+            <li>Завершение пускового режима.</li>
+          </ol>
+          <p class="muted">Точные аппараты, номера проводов, контакты и выдержки времени добавим после сверки соответствующих страниц пособия и схемы.</p>
+        </div>
+      </div>
+
+      <div id="page-motion" class="page"><div class="eyebrow">МОДУЛЬ 02</div><h1>Приведение в движение</h1><div class="panel"><span class="tag amber">В разработке</span><p>Будут разобраны выбор направления, условия сбора схемы тяги, поездные контакторы и включение возбуждения.</p></div></div>
+
+      <div id="page-excitation" class="page"><div class="eyebrow">МОДУЛЬ 03</div><h1>Возбуждение</h1><div class="panel"><span class="tag amber">В разработке</span><p>Отдельно разберём ВСТ, УСТА, МУВ, КМ1, КВ и аварийный режим возбуждения.</p></div></div>
+
+      <div id="page-field" class="page">
+        <div class="eyebrow">МОДУЛЬ 04</div><h1>Ослабление поля</h1>
+        <p class="lead">Две ступени ослабления возбуждения тяговых двигателей.</p>
+        <div class="panel">
+          <div class="panel-head"><strong>Параметры из пособия</strong><span class="tag green">Источник проверен</span></div>
+          <div class="fact-grid">
+            <div><small>Первая ступень Ш1</small><strong>20 км/ч</strong><span>Условие скорости, указанное в описании</span></div>
+            <div><small>Вторая ступень Ш2</small><strong>32 км/ч</strong><span>Условие скорости, указанное в описании</span></div>
+            <div><small>Ток возбуждения</small><strong>48%</strong><span>После включения Ш1</span></div>
+            <div><small>Ток возбуждения</small><strong>25%</strong><span>После включения Ш2</span></div>
+          </div>
+          <p>Включение Ш1 описано через РУ40 и РВ6. Ш2 включается по команде УСТА. Между последовательными включениями предусмотрен интервал не менее 10 секунд.</p>
+          <p class="muted">Показатели относятся к описанию алгоритма в учебном пособии. Реальные пороги УСТА также зависят от соотношения тока и напряжения силовой цепи.</p>
+        </div>
+      </div>
+
+      <div id="page-protection" class="page"><div class="eyebrow">МОДУЛЬ 05</div><h1>Защита</h1><div class="panel"><span class="tag amber">В разработке</span><p>Разберём реле заземления РЗ, перегрев воды и масла, защиту от боксования, блокировки запуска и отключение неисправной тележки.</p></div></div>
+
+      <div id="page-sart" class="page"><div class="eyebrow">МОДУЛЬ 06</div><h1>САРТ</h1><div class="panel"><span class="tag amber">В разработке</span><p>Автоматическое управление холодильником: термореле, РУ19, электропневматические вентили, жалюзи и муфта вентилятора.</p></div></div>
+
+      <div id="page-brake" class="page"><div class="eyebrow">МОДУЛЬ 07</div><h1>Реостатный тормоз</h1><div class="panel"><span class="tag amber">В разработке</span><p>Последовательность включения РЭТ, КВТ1 и КТ1, подключение тяговых двигателей к тормозным резисторам.</p></div></div>
+
+      <div id="page-faults" class="page">
+        <div class="eyebrow">ПРАКТИЧЕСКОЕ ЗАДАНИЕ</div><h1>Режим неисправностей</h1>
+        <p class="lead">Выбери учебную неисправность и попробуй определить, какой участок схемы требует проверки.</p>
+        <div class="panel">
+          <label for="fault-select">Учебная ситуация</label>
+          <select id="fault-select">
+            <option value="ground">Сработало реле заземления РЗ</option>
+            <option value="overheat">Перегрев воды или масла дизеля</option>
+            <option value="slip">Возникло боксование</option>
+            <option value="field">Не включается первая ступень ослабления поля</option>
+          </select>
+          <button class="primary" id="show-fault">Показать задачу</button>
+          <div id="fault-task" class="fault-task" aria-live="polite">После выбора ситуации появится описание условий и вопросы для диагностики.</div>
+        </div>
+      </div>
+      <footer>Учебная версия · ТЭМ18ДМ · 13-я серия · ЭСУВТ</footer>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
