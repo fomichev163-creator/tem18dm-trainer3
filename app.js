@@ -1342,3 +1342,19 @@ installBtn?.addEventListener("click", async () => {
   deferredPrompt = null;
   installBtn.style.display = "none";
 });
+// Скачивание готовой PNG-иконки 512x512 при клике на логотип "ТЭМ" в шапке
+document.querySelector(".brand-mark")?.addEventListener("click", () => {
+  fetch("icon.svg").then(r => r.text()).then(t => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      c.getContext("2d").drawImage(img, 0, 0, 512, 512);
+      const a = document.createElement("a");
+      a.download = "icon-512.png";
+      a.href = c.toDataURL("image/png");
+      a.click();
+    };
+    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(t)));
+  });
+});
