@@ -627,6 +627,61 @@ const modulesData = {
 };
 
 // Рендер интерактивных модулей
+// Координатные зоны на схеме Схема ТЭМ18ДМ ЭСУВТ.jpg (в % от размеров изображения)
+const schemaZones = {
+  start: [
+    {x:1,  y:2,  w:27, h:13, label:"КБУ, SF1, КТН и питание ЦУ"},
+    {x:1,  y:53, w:27, h:18, label:"Пуск SB7, РУ12, РУ7, РВ2, РУ28"},
+    {x:1,  y:2,  w:27, h:12, label:"Контактор КТН и электродвигатель ТН"},
+    {x:2,  y:54, w:26, h:18, label:"Цепь РУ7 → РВ2 → РУ28"},
+    {x:1,  y:1,  w:27, h:10, label:"Контактор КМН и прокачка масла (РВ3 40с)"},
+    {x:2,  y:60, w:26, h:16, label:"Выдержка 40с: РВ3 → РУ29 → РУ5 → РВ5"},
+    {x:2,  y:66, w:26, h:14, label:"Пусковой контактор Д1 и реле РЭР (ЭСУВТ)"},
+    {x:2,  y:67, w:26, h:13, label:"Датчик РДМ (SP1) и реле разбора пуска РУ4"},
+    {x:12, y:58, w:16, h:15, label:"Защита АБ: таймер РВ5 (17с) и реле РУ30"}
+  ],
+  excitation: [
+    {x:2,  y:68, w:26, h:12, label:"Включение КУ17 после отключения Д1"},
+    {x:35, y:10, w:32, h:24, label:"Рабочее возбуждение ВСТ: КУ17, КМ1, ШИМ УСТА"},
+    {x:35, y:24, w:33, h:24, label:"МУВ (+150А/-150А), заряд БА и реле РНП"},
+    {x:35, y:8,  w:25, h:22, label:"Аварийный режим ВСТ: SA1, РКМ1, ВВ и БРН"},
+    {x:48, y:14, w:20, h:22, label:"Аварийное возбуждение ТГ от блока БАВ"}
+  ],
+  motion: [
+    {x:3,  y:12, w:25, h:12, label:"Реверсор Вперёд/Назад и контактор КУ10"},
+    {x:2,  y:14, w:26, h:14, label:"1-я позиция: ЭПК, РММ1, двери ВВК БК1–3, РУ2, РВ4"},
+    {x:2,  y:18, w:26, h:12, label:"Поездные контакторы П1, П2 и отключатель ОМ"},
+    {x:3,  y:21, w:26, h:12, label:"Цепь защит катушек КВ и РКВ (РТ, SP2, РТ6, РТ3, РЗ)"},
+    {x:68, y:72, w:30, h:26, label:"Блок управления ЭСУВТ.01 (ДВ1–ДВ4 скорость, ТНВД)"}
+  ],
+  field: [
+    {x:2,  y:15, w:25, h:12, label:"Тумблер SA3 «Управление переходами» → УСТА (В5)"},
+    {x:10, y:45, w:18, h:10, label:"1-я ступень Ш1 (20 км/ч): РУ40 → РВ6 → вентиль Ш1"},
+    {x:10, y:45, w:18, h:10, label:"2-я ступень Ш2 (32 км/ч): команда УСТА → катушка Ш2"},
+    {x:68, y:8,  w:30, h:32, label:"Силовая схема ТЭД 1–6 и резисторы СШ1, СШ2"}
+  ],
+  protection: [
+    {x:36, y:36, w:26, h:12, label:"Реле заземления РЗ, выпрямитель БВ3 и рубильники ВРЗ1/ВРЗ2"},
+    {x:4,  y:22, w:24, h:10, label:"Защита КВ: реле тока РТ и термореле РТ3 (90°C), РТ6 (75°C)"},
+    {x:12, y:38, w:16, h:9,  label:"Дифманометр картера SL: реле РУ21 (6 мм) и РУ22 (29 мм)"},
+    {x:29, y:45, w:16, h:12, label:"Прожиг коллектора (РУ24) и блокировка зарядки депо (РИТ, РУ16)"},
+    {x:68, y:8,  w:30, h:32, label:"Датчики боксования ДБ1, ДБ2 и делители СРБ1, СРБ2"}
+  ],
+  sart: [
+    {x:48, y:49, w:26, h:12, label:"Вода +80°C: термореле SK1.1 (РТ1) → реле РУ19 → ВП1, ВП3"},
+    {x:48, y:55, w:26, h:18, label:"Вода +84°C: термореле SK1.1 (РТ2) → вентиль муфты ВП4"},
+    {x:48, y:49, w:26, h:10, label:"Наддувочный контур +35°C: SK2 (РТ7) → вентиль ВП5"},
+    {x:48, y:53, w:26, h:19, label:"Наддув и масло +55°C: SK2 (РТ5) → вентили ВП4 и ВП3"}
+  ],
+  brake: [
+    {x:12, y:26, w:17, h:12, label:"Включение реле электротормоза РЭТ (через р.к. РВ4 и Ш1)"},
+    {x:11, y:31, w:17, h:10, label:"Цепь тормозных контакторов КВТ1 и КТ1"},
+    {x:68, y:8,  w:30, h:32, label:"Силовая цепь реостатного тормоза: ТЭД, КВТ1, КТ1 и БТР"},
+    {x:12, y:26, w:17, h:11, label:"Автоматическое замещение тормоза: вентиль ВЗТ (пр.5138 → 4041)"}
+  ]
+};
+
+// Рендер интерактивных модулей со встроенным окном схемы и зумом
 function renderModulePage(key){
   const data = modulesData[key];
   const container = document.getElementById(`page-${key}`);
@@ -636,6 +691,8 @@ function renderModulePage(key){
 
   function updateView(){
     const step = data.steps[currentStep];
+    const zone = (schemaZones[key] && schemaZones[key][currentStep]) || {x:5, y:5, w:30, h:25, label:step.name};
+
     container.innerHTML = `
       <div class="eyebrow">${data.eyebrow}</div>
       <h1>${data.title}</h1>
@@ -681,9 +738,34 @@ function renderModulePage(key){
           <strong>Работа схемы на данном этапе:</strong><br>
           ${step.desc}
         </div>
+
+        <!-- Интерактивное окно принципиальной схемы с подсветкой участка -->
+        <div class="schema-viewer-wrap">
+          <div class="schema-toolbar">
+            <div class="schema-toolbar-title">
+              <span>🗺 Участок на полной схеме:</span>
+              <strong>${zone.label}</strong>
+            </div>
+            <div class="schema-controls">
+              <button class="schema-btn focus-btn" id="focus-zone-${key}">🎯 Навести на участок</button>
+              <button class="schema-btn" id="zoom-in-${key}">＋ Приблизить</button>
+              <button class="schema-btn" id="zoom-out-${key}">－ Отдалить</button>
+              <button class="schema-btn" id="zoom-reset-${key}">⛶ Вся схема</button>
+            </div>
+          </div>
+          <div class="schema-viewport" id="viewport-${key}">
+            <div class="schema-canvas" id="canvas-${key}">
+              <img src="schema.jpg" id="img-${key}" alt="Электрическая схема ТЭМ18ДМ с ЭСУВТ">
+              <div class="schema-highlight" id="hl-${key}" style="left:${zone.x}%; top:${zone.y}%; width:${zone.w}%; height:${zone.h}%;">
+                <div class="schema-highlight-label">${zone.label}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
+    // Навигация по шагам
     container.querySelectorAll(".step-pill").forEach(btn => {
       btn.addEventListener("click", () => {
         currentStep = Number(btn.dataset.step);
@@ -694,6 +776,106 @@ function renderModulePage(key){
     const nextBtn = container.querySelector(`#next-${key}`);
     if(prevBtn) prevBtn.addEventListener("click", () => { if(currentStep>0){ currentStep--; updateView(); }});
     if(nextBtn) nextBtn.addEventListener("click", () => { if(currentStep<data.steps.length-1){ currentStep++; updateView(); }});
+
+    // Логика зума и панорамирования схемы
+    const viewport = container.querySelector(`#viewport-${key}`);
+    const canvas = container.querySelector(`#canvas-${key}`);
+    const img = container.querySelector(`#img-${key}`);
+
+    let scale = 1, panX = 0, panY = 0;
+    let isDragging = false, startX = 0, startY = 0;
+
+    function applyTransform(smooth = false){
+      canvas.style.transition = smooth ? "transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)" : "none";
+      canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+    }
+
+    function focusOnZone(smooth = true){
+      const vw = viewport.clientWidth || 800;
+      const vh = viewport.clientHeight || 460;
+      const iw = img.offsetWidth || 2400;
+      const ih = img.offsetHeight || 1700;
+
+      const zx = (zone.x / 100) * iw;
+      const zy = (zone.y / 100) * ih;
+      const zw = (zone.w / 100) * iw;
+      const zh = (zone.h / 100) * ih;
+
+      scale = Math.min(Math.max(Math.min(vw / (zw * 1.35), vh / (zh * 1.35)), 0.45), 2.6);
+      panX = (vw / 2) - (zx + zw / 2) * scale;
+      panY = (vh / 2) - (zy + zh / 2) * scale;
+      applyTransform(smooth);
+    }
+
+    function fitFullSchema(){
+      const vw = viewport.clientWidth || 800;
+      const iw = img.offsetWidth || 2400;
+      scale = Math.max(vw / iw, 0.35);
+      panX = 0;
+      panY = 0;
+      applyTransform(true);
+    }
+
+    if(img.complete){
+      setTimeout(() => focusOnZone(false), 30);
+    } else {
+      img.addEventListener("load", () => focusOnZone(false));
+    }
+
+    // Кнопки управления схемой
+    container.querySelector(`#focus-zone-${key}`)?.addEventListener("click", () => focusOnZone(true));
+    container.querySelector(`#zoom-reset-${key}`)?.addEventListener("click", fitFullSchema);
+    container.querySelector(`#zoom-in-${key}`)?.addEventListener("click", () => {
+      const vw = viewport.clientWidth / 2, vh = viewport.clientHeight / 2;
+      const nextScale = Math.min(scale * 1.3, 4);
+      panX = vw - (vw - panX) * (nextScale / scale);
+      panY = vh - (vh - panY) * (nextScale / scale);
+      scale = nextScale;
+      applyTransform(true);
+    });
+    container.querySelector(`#zoom-out-${key}`)?.addEventListener("click", () => {
+      const vw = viewport.clientWidth / 2, vh = viewport.clientHeight / 2;
+      const nextScale = Math.max(scale / 1.3, 0.28);
+      panX = vw - (vw - panX) * (nextScale / scale);
+      panY = vh - (vh - panY) * (nextScale / scale);
+      scale = nextScale;
+      applyTransform(true);
+    });
+
+    // Перетаскивание мышью и пальцем (Pointer Events)
+    viewport.addEventListener("pointerdown", e => {
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+      viewport.classList.add("dragging");
+      viewport.setPointerCapture(e.pointerId);
+    });
+    viewport.addEventListener("pointermove", e => {
+      if(!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      applyTransform(false);
+    });
+    const stopDrag = () => {
+      isDragging = false;
+      viewport.classList.remove("dragging");
+    };
+    viewport.addEventListener("pointerup", stopDrag);
+    viewport.addEventListener("pointercancel", stopDrag);
+
+    // Зум колесом мыши
+    viewport.addEventListener("wheel", e => {
+      e.preventDefault();
+      const rect = viewport.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const factor = e.deltaY < 0 ? 1.15 : 0.87;
+      const nextScale = Math.min(Math.max(scale * factor, 0.28), 4.5);
+      panX = mx - (mx - panX) * (nextScale / scale);
+      panY = my - (my - panY) * (nextScale / scale);
+      scale = nextScale;
+      applyTransform(false);
+    }, {passive: false});
   }
 
   updateView();
