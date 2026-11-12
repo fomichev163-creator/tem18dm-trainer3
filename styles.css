@@ -363,3 +363,102 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:17px 0;color:#6f
 @media(max-width: 650px) {
   .switching-summary { grid-template-columns: 1fr; }
 }
+/* Навигатор по номерам проводов и зажимам */
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wire-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 10, 15, 0.82);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+.wire-modal-card {
+  background: var(--panel);
+  border: 1px solid #355269;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.65);
+}
+.wire-search-bar {
+  margin-bottom: 14px;
+}
+.quick-wires {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.wire-chip {
+  background: #132433;
+  border: 1px solid #2b455b;
+  color: #8ec8ff;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11.5px;
+  cursor: pointer;
+  font-family: monospace;
+}
+.wire-chip:hover {
+  border-color: var(--green);
+  color: var(--green);
+}
+.wire-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.wire-hit-card {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px 15px;
+  display: flex;
+   flex-direction: column;
+  gap: 8px;
+}
+.wire-hit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wire-hit-path {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12.5px;
+  background: #0b131b;
+  padding: 9px 11px;
+  border-radius: 7px;
+  border: 1px solid #223546;
+  color: #c7daea;
+  line-height: 1.5;
+}
+mark.wire-hl {
+  background: #f1b65b;
+  color: #08131c;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 900;
+}
+@media(max-width: 650px) {
+  .topbar { height: auto; padding: 10px 14px; flex-wrap: wrap; }
+  .topbar-actions { width: 100%; justify-content: space-between; margin-top: 4px; }
+}
