@@ -1206,3 +1206,139 @@ function updateConnection(){
 window.addEventListener("online", updateConnection);
 window.addEventListener("offline", updateConnection);
 updateConnection();
+// =========================================================================
+// ПУНКТ 4: СКВОЗНОЙ НАВИГАТОР ПО ПРОBОДАМ, ЗАЖИМАМ, РАЗЪЁМАМ И АППАРАТАМ
+// =========================================================================
+const wireModal = document.getElementById("wire-modal");
+const openWireBtn = document.getElementById("open-wire-modal");
+const heroWireBtn = document.getElementById("hero-wire-btn");
+const closeWireBtn = document.getElementById("close-wire-modal");
+const wireInput = document.getElementById("global-wire-input");
+const wireResults = document.getElementById("global-wire-results");
+
+// Дополнительная база специфических проводов (СМЕ, изоляция РСИ, гребнесмазыватель)
+const extraWiresDB = [
+  {mod:"home", stepIdx:0, modTitle:"Система двух единиц (СМЕ)", stepName:"Межтепловозные соединения", path:"Пр. 592, 593 (реверсор и П1, П2 ведомой секции) → Пр. 594 (включение РВ4, КВ, РКВ) → Пр. 599, 657, 658, 659 (клапаны ДВ1–ДВ4 ЭСУВТ) → Пр. 1738 (прожиг РУ24) → Пр. 2855 (электротормоз в УСТА) → Пр. 584 (песочницы ВПВ/ВПН) → Пр. 697, 698 (прожектор) → Пр. 591 (вызов помощника СБ) → Пр. 597 от зажима 2/2 (общий минус секций)", desc:"При работе по системе двух единиц (ПЧТ в пол. II, SA23 в пол. «Ведомый») управление второй секцией идёт по этим межтепловозным проводам."},
+  {mod:"protection", stepIdx:0, modTitle:"Контроль изоляции и гребнесмазыватель", stepName:"Цепь реле РСИ (ДН2) и блока АГС8 (БГ)", path:"Изоляция: УСТА → пр.5160 → катушка РСИ → пр.413, 2773, 249, 463 → минус 2/6 (подключает плюс/минус к ДН2). Гребнесмазыватель: зажим 14/2 → пр.335 → SF1 → пр.855 → КБУ → пр.1918 → зажимы 1/4, 1/8 → пр.136 → ХБГ(1) «+Пит» БГ → р.к. Р → пр.2704 → Р11(1) → пр.2705 → катушка ВГ1 → пр.2706 → пр.2707 → зажим 2/18 → минус", desc:"Периодический контроль сопротивления изоляции низковольтной цепи (кадр «Бортовая сеть») и подача смазки на гребни колёс."}
+];
+
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function searchAllWires(query) {
+  if(!wireResults) return;
+  const q = query.trim();
+  if(!q) {
+    wireResults.innerHTML = `<div class="muted" style="padding:12px">Начните вводить номер провода (например, <b>2772</b>, <b>5013</b>, <b>187</b>), номер зажима (<b>14/4</b>, <b>2/8</b>) или обозначение аппарата, чтобы увидеть все цепи его прохождения.</div>`;
+    return;
+  }
+
+  const hits = [];
+  const regex = new RegExp(`(${escapeRegExp(q)})`, "gi");
+
+  // Поиск по всем пошаговым модулям
+  Object.entries(modulesData).forEach(([modKey, modObj]) => {
+    modObj.steps.forEach((st, idx) => {
+      const fullChainText = st.chain.map(n => n.v).join(" → ");
+      const fullActiveText = st.activeApps.join(", ");
+      const combined = `${st.name} ${fullChainText} ${fullActiveText} ${st.desc}`;
+      if(combined.toLowerCase().includes(q.toLowerCase())) {
+        hits.push({
+          mod: modKey,
+          stepIdx: idx,
+          modTitle: modObj.title,
+          stepName: st.name,
+          path: fullChainText,
+          desc: st.desc
+        });
+      }
+    });
+  });
+
+  // Поиск по дополнительной базе (СМЕ, РСИ, АГС8)
+  extraWiresDB.forEach(item => {
+    if((item.path + " " + item.desc + " " + item.stepName).toLowerCase().includes(q.toLowerCase())) {
+      hits.push(item);
+    }
+  });
+
+  if(!hits.length) {
+    wireResults.innerHTML = `<div class="muted" style="padding:12px">По запросу «<b>${q}</b>» совпадений не найдено. Попробуйте ввести только цифры номера провода (например: <b>734</b>, <b>2000</b>, <b>841</b>).</div>`;
+    return;
+  }
+
+  wireResults.innerHTML = hits.map((h, i) => {
+    const hlPath = h.path.replace(regex, `<mark class="wire-hl">$1</mark>`);
+    const hlDesc = h.desc.replace(regex, `<mark class="wire-hl">$1</mark>`);
+    return `
+      <div class="wire-hit-card">
+        <div class="wire-hit-head">
+          <div>
+            <span class="tag green">${h.modTitle}</span>
+            <strong style="margin-left:8px">${h.stepName}</strong>
+          </div>
+          <button class="schema-btn focus-btn goto-wire-step" data-mod="${h.mod}" data-step="${h.stepIdx}">
+            🎯 Открыть шаг и схему →
+          </button>
+        </div>
+        <div class="wire-hit-path">${hlPath}</div>
+        <div class="muted" style="font-size:12.5px">${hlDesc}</div>
+      </div>
+    `;
+  }).join("");
+
+  wireResults.querySelectorAll(".goto-wire-step").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetMod = btn.dataset.mod;
+      const targetStep = Number(btn.dataset.step);
+      wireModal.style.display = "none";
+      showPage(targetMod);
+      // Переключаем нужный шаг внутри выбранного модуля
+      const pageEl = document.getElementById(`page-${targetMod}`);
+      const pill = pageEl?.querySelector(`.step-pill[data-step="${targetStep}"]`);
+      if(pill) pill.click();
+    });
+  });
+}
+
+function openWireNavigator(initialQuery = "") {
+  if(!wireModal) return;
+  wireModal.style.display = "flex";
+  if(initialQuery) wireInput.value = initialQuery;
+  wireInput.focus();
+  searchAllWires(wireInput.value);
+}
+
+openWireBtn?.addEventListener("click", () => openWireNavigator());
+heroWireBtn?.addEventListener("click", () => openWireNavigator());
+closeWireBtn?.addEventListener("click", () => { wireModal.style.display = "none"; });
+wireModal?.addEventListener("click", e => { if(e.target === wireModal) wireModal.style.display = "none"; });
+wireInput?.addEventListener("input", e => searchAllWires(e.target.value));
+
+document.querySelectorAll(".wire-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    wireInput.value = chip.dataset.q;
+    searchAllWires(chip.dataset.q);
+  });
+});
+
+// =========================================================================
+// ПУНКТ 5: УСТАНОВКА НА ANDROID (PWA INSTALL PROMPT)
+// =========================================================================
+let deferredPrompt = null;
+const installBtn = document.getElementById("install-pwa-btn");
+
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if(installBtn) installBtn.style.display = "inline-flex";
+});
+
+installBtn?.addEventListener("click", async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.style.display = "none";
+});
